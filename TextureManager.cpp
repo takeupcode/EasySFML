@@ -16,14 +16,14 @@ TextureManager::TextureManager (Director * director)
 {
 }
 
-sf::Texture * TextureManager::texture (const std::string & name) const
+std::shared_ptr<sf::Texture> TextureManager::texture (const std::string & name) const
 {
-    sf::Texture * matchingTexture = nullptr;
+    std::shared_ptr<sf::Texture> matchingTexture;
     
     auto position = mTextures.find(name);
     if (position != mTextures.end())
     {
-        matchingTexture = position->second.second.get();
+        matchingTexture = position->second.second;
     }
     
     return matchingTexture;
@@ -38,8 +38,8 @@ void TextureManager::loadTexture (const std::string & name, const std::string & 
     }
     else
     {
-        sf::Texture * newTexture = new sf::Texture();
-        mTextures.emplace(name, make_pair(1, unique_ptr<sf::Texture>(newTexture)));
+        shared_ptr<sf::Texture> newTexture(new sf::Texture());
+        mTextures.emplace(name, make_pair(1, newTexture));
         
         if (!newTexture->loadFromFile(path))
         {

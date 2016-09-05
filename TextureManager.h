@@ -23,7 +23,7 @@ public Directable
 public:
     explicit TextureManager (Director * director);
     
-    sf::Texture * texture (const std::string & name) const;
+    std::shared_ptr<sf::Texture> texture (const std::string & name) const;
     
     void loadTexture (const std::string & name, const std::string & path);
     
@@ -37,5 +37,5 @@ private:
     
     void loadTriggers ();
     
-    std::map<std::string, std::pair<int, std::unique_ptr<sf::Texture>>> mTextures;
+    std::map<std::string, std::pair<int, std::shared_ptr<sf::Texture>>> mTextures;
 };
