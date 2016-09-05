@@ -1,6 +1,6 @@
 //
 //  TextureManager.h
-//  Bounce
+//  EasySFML
 //
 //  Created by Abdul Wahid Tanner on 9/3/16.
 //  Copyright © 2016 Take Up Code. All rights reserved.
