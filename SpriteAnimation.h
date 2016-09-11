@@ -8,16 +8,72 @@
 
 #pragma once
 
+#include <memory>
+
 #include <SFML/Graphics.hpp>
+
+#include "SpriteSheet.h"
+#include "Window.h"
 
 class SpriteAnimation
 {
 public:
-    SpriteAnimation (const sf::Vector2u & scale);
-    ~SpriteAnimation ();
+    SpriteAnimation (std::shared_ptr<SpriteSheet> sheet, const std::string & animationName, const sf::Vector2f & scale);
     
-    sf::Vector2f scale () const;
+    SpriteAnimation (const SpriteAnimation &) = default;
+    SpriteAnimation (SpriteAnimation &&) = default;
     
+    SpriteAnimation & operator = (const SpriteAnimation &) = default;
+    SpriteAnimation & operator = (SpriteAnimation &&) = default;
+    
+    sf::Vector2f scale () const
+    {
+        return mScale;
+    }
+    
+    sf::Vector2f position ()
+    {
+        return mSprite.getPosition();
+    }
+    
+    sf::Vector2f size ()
+    {
+        if (mCurrentFrame)
+        {
+            sf::Vector2i unscaledSize = mCurrentFrame->size();
+            return {unscaledSize.x * mScale.x, unscaledSize.y * mScale.y};
+        }
+        
+        return {0.0f, 0.0f};
+    }
+    
+    void setPosition (const sf::Vector2f & position)
+    {
+        mSprite.setPosition(position);
+    }
+    
+    void update (float elapsedSeconds);
+    
+    void move (const sf::Vector2f & delta)
+    {
+        mSprite.setPosition(mSprite.getPosition() + delta);
+    }
+
+    void draw (Window * window)
+    {
+        if (mCurrentFrame)
+        {
+            window->draw(mSprite);
+        }
+    }
+
 private:
-    sf::Vector2f & mScale;
+    sf::Vector2f mScale;
+    std::shared_ptr<SpriteSheet> mSheet;
+    AnimationDefinition * mCurrentAnimation;
+    FrameDefinition * mCurrentFrame;
+    unsigned int mCurrentIndex;
+    float mTimeInFrame;
+    sf::Sprite mSprite;
+    bool mUpdateSprite;
 };
