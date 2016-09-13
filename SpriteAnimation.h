@@ -18,7 +18,7 @@
 class SpriteAnimation
 {
 public:
-    SpriteAnimation (std::shared_ptr<SpriteSheet> sheet, const std::string & animationName, const sf::Vector2f & scale);
+    SpriteAnimation (std::shared_ptr<SpriteSheet> sheet, const std::string & animationName, const sf::Vector2f & scale, unsigned int beginningIndex = 0);
     
     SpriteAnimation (const SpriteAnimation &) = default;
     SpriteAnimation (SpriteAnimation &&) = default;

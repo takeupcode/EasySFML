@@ -8,8 +8,8 @@
 
 #include "SpriteAnimation.h"
 
-SpriteAnimation::SpriteAnimation (std::shared_ptr<SpriteSheet> sheet, const std::string & animationName, const sf::Vector2f & scale)
-: mScale(scale), mSheet(sheet), mCurrentIndex(0), mTimeInFrame(0), mUpdateSprite(true)
+SpriteAnimation::SpriteAnimation (std::shared_ptr<SpriteSheet> sheet, const std::string & animationName, const sf::Vector2f & scale, unsigned int beginningIndex)
+: mScale(scale), mSheet(sheet), mCurrentIndex(beginningIndex), mTimeInFrame(0), mUpdateSprite(true)
 {
     mSprite.setScale(mScale);
     mCurrentAnimation = mSheet->animation(animationName);
