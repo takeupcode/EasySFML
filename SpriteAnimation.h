@@ -36,11 +36,11 @@ public:
         return mSprite.getPosition();
     }
     
-    sf::Vector2f size ()
+    sf::Vector2f scaledSize ()
     {
         if (mCurrentFrame)
         {
-            sf::Vector2i unscaledSize = mCurrentFrame->size();
+            sf::Vector2u unscaledSize = mCurrentFrame->size();
             return {unscaledSize.x * mScale.x, unscaledSize.y * mScale.y};
         }
         
@@ -53,11 +53,6 @@ public:
     }
     
     void update (float elapsedSeconds);
-    
-    void move (const sf::Vector2f & delta)
-    {
-        mSprite.setPosition(mSprite.getPosition() + delta);
-    }
 
     void draw (Window * window)
     {

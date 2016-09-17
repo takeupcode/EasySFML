@@ -18,6 +18,8 @@
 #include "SpriteSheet.h"
 #include "Window.h"
 
+class Entity;
+
 class Region
 {
 public:
@@ -59,6 +61,16 @@ public:
         mPosition = position;
     }
     
+    float gravity ()
+    {
+        return mGravity;
+    }
+    
+    void setGravity (float gravity)
+    {
+        mGravity = gravity;
+    }
+    
     bool addTileType (const std::string & typeName, const std::string & animationName, unsigned int beginningIndex = 0);
     
     void setTile (unsigned int x, unsigned int y, const std::string & typeName);
@@ -68,6 +80,8 @@ public:
     void update (float elapsedSeconds);
     
     void draw (Window * window);
+    
+    void resolveCollisions (Entity * entity);
     
 private:
     unsigned int index (unsigned int x, unsigned int y)
@@ -79,6 +93,7 @@ private:
     sf::Vector2u mRegionSize;
     sf::Vector2u mTileSize;
     sf::Vector2f mPosition;
+    float mGravity;
     std::shared_ptr<SpriteSheet> mSheet;
     std::unordered_map<std::string, std::unique_ptr<SpriteAnimation>> mTileTypes;
     std::vector<std::string> mTiles;

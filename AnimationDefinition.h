@@ -50,7 +50,7 @@ public:
         return nullptr;
     }
     
-    FrameDefinition * addFrame (float time, const sf::Vector2i & topLeft, const sf::Vector2i & size)
+    FrameDefinition * addFrame (float time, const sf::Vector2u & topLeft, const sf::Vector2u & size)
     {
         mFrames.emplace_back(std::unique_ptr<FrameDefinition>(new FrameDefinition(time, topLeft, size)));
         

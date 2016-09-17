@@ -30,14 +30,14 @@ public:
         return mTime;
     }
     
-    sf::Vector2i size () const
+    sf::Vector2u size () const
     {
         return mSize;
     }
     
     sf::IntRect croppingRectangle () const
     {
-        return sf::IntRect(mTopLeft, mSize);
+        return sf::IntRect(mTopLeft.x, mTopLeft.y, mSize.x, mSize.y);
     }
     
     FrameTag * tag (const std::string & name)
@@ -83,7 +83,7 @@ public:
 private:
     friend class AnimationDefinition;
     
-    FrameDefinition (float time, const sf::Vector2i & topLeft, const sf::Vector2i & size)
+    FrameDefinition (float time, const sf::Vector2u & topLeft, const sf::Vector2u & size)
     : mTime(time), mTopLeft(topLeft), mSize(size)
     { }
     
@@ -94,7 +94,7 @@ private:
     }
     
     float mTime;
-    sf::Vector2i mTopLeft;
-    sf::Vector2i mSize;
+    sf::Vector2u mTopLeft;
+    sf::Vector2u mSize;
     std::unordered_map<std::string, std::unique_ptr<FrameTag>> mTags;
 };
