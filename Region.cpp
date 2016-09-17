@@ -81,6 +81,13 @@ void Region::draw (Window * window)
 
 void Region::resolveCollisions (Entity * entity)
 {
+    
+    sf::Rect<unsigned int> entityRect;
+    entityRect.left = entity->position().x - entity->scaledSize().x / 2;
+    entityRect.top = entity->position().y - entity->scaledSize().y;
+    entityRect.width = entity->scaledSize().x;
+    entityRect.height = entity->scaledSize().y;
+    
     for (unsigned int x = 0; x < mRegionSize.x; ++x)
     {
         for (unsigned int y = 0; y < mRegionSize.y; ++y)
@@ -99,16 +106,26 @@ void Region::resolveCollisions (Entity * entity)
                     tileRect.width = tile->scaledSize().x;
                     tileRect.height = tile->scaledSize().y;
                     
-                    sf::Rect<unsigned int> entityRect;
-                    entityRect.left = entity->position().x - entity->scaledSize().x / 2;
-                    entityRect.top = entity->position().y - entity->scaledSize().y;
-                    entityRect.width = entity->scaledSize().x;
-                    entityRect.height = entity->scaledSize().y;
-                    
-                    if (entityRect.intersects(tileRect))
+                    sf::Rect<unsigned int> intersectRect;
+                    if (entityRect.intersects(tileRect, intersectRect))
                     {
-                        entity->setPosition({entity->position().x, static_cast<float>(tileRect.top)});
-                        entity->setVelocity({entity->velocity().x, 0.0f});
+                        if (intersectRect.width > intersectRect.height)
+                        {
+                            entity->setPosition({entity->position().x, static_cast<float>(tileRect.top)});
+                            entity->setVelocity({entity->velocity().x, 0.0f});
+                        }
+                        else
+                        {
+                            if (intersectRect.left + intersectRect.left + intersectRect.width < tileRect.left + tileRect.left + tileRect.width)
+                            {
+                                entity->setPosition({static_cast<float>(tileRect.left) - entity->scaledSize().x / 2, entity->position().y});
+                            }
+                            else
+                            {
+                                entity->setPosition({static_cast<float>(tileRect.left + tileRect.width) + entity->scaledSize().x / 2, entity->position().y});
+                            }
+                            entity->setVelocity({0.0f, entity->velocity().y});
+                        }
                         return;
                     }
                 }
