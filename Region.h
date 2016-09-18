@@ -89,6 +89,17 @@ private:
         return x + y * mRegionSize.x;
     }
     
+    struct CollisionData
+    {
+        SpriteAnimation * mTile;
+        sf::Rect<unsigned int> mTileRect;
+        unsigned int mCollisionArea;
+    };
+    
+    void detectCollisions (const sf::Rect<unsigned int> & entityRect);
+    
+    static bool sortCollisions (const CollisionData & item1, const CollisionData & item2);
+    
     sf::Vector2f mScale;
     sf::Vector2u mRegionSize;
     sf::Vector2u mTileSize;
@@ -97,4 +108,5 @@ private:
     std::shared_ptr<SpriteSheet> mSheet;
     std::unordered_map<std::string, std::unique_ptr<SpriteAnimation>> mTileTypes;
     std::vector<std::string> mTiles;
+    std::vector<CollisionData> mCollisions;
 };

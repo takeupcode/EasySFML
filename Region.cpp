@@ -47,18 +47,18 @@ void Region::draw (Window * window)
     sf::Vector2f viewCenter = view.getCenter();
     sf::Vector2f viewSize = view.getSize();
     
-    sf::Rect<unsigned int> tilesInView;
-    tilesInView.left = floor((viewCenter.x - viewSize.x / 2) / mTileSize.x);
-    tilesInView.top = floor((viewCenter.y - viewSize.y / 2) / mTileSize.y);
-    tilesInView.width = ceil((viewCenter.x + viewSize.x / 2) / mTileSize.x);
-    tilesInView.height = ceil((viewCenter.y + viewSize.y / 2) / mTileSize.y);
-    for (unsigned int x = tilesInView.left; x <= tilesInView.left + tilesInView.width; ++x)
+    unsigned int fromX = floorf((viewCenter.x - viewSize.x / 2) / mTileSize.x);
+    unsigned int toX = ceilf((viewCenter.x + viewSize.x / 2) / mTileSize.x);
+    unsigned int fromY = floorf((viewCenter.y - viewSize.y / 2) / mTileSize.y);
+    unsigned int toY = ceilf((viewCenter.y + viewSize.y / 2) / mTileSize.y);
+    
+    for (unsigned int x = fromX; x <= toX; ++x)
     {
         if (x >= mRegionSize.x)
         {
             continue;
         }
-        for (unsigned int y = tilesInView.top; y <= tilesInView.top + tilesInView.height; ++y)
+        for (unsigned int y = fromY; y <= toY; ++y)
         {
             if (y >= mRegionSize.y)
             {
@@ -81,17 +81,68 @@ void Region::draw (Window * window)
 
 void Region::resolveCollisions (Entity * entity)
 {
-    
     sf::Rect<unsigned int> entityRect;
-    entityRect.left = entity->position().x - entity->scaledSize().x / 2;
-    entityRect.top = entity->position().y - entity->scaledSize().y;
-    entityRect.width = entity->scaledSize().x;
-    entityRect.height = entity->scaledSize().y;
+    entityRect.left = floorf(entity->position().x - entity->scaledSize().x / 2);
+    entityRect.top = floorf(entity->position().y - entity->scaledSize().y);
+    entityRect.width = ceilf(entity->scaledSize().x);
+    entityRect.height = ceilf(entity->scaledSize().y);
     
-    for (unsigned int x = 0; x < mRegionSize.x; ++x)
+    detectCollisions(entityRect);
+    
+    SpriteAnimation * surface = nullptr;
+    for (auto & data: mCollisions)
     {
-        for (unsigned int y = 0; y < mRegionSize.y; ++y)
+        sf::Rect<unsigned int> collisionRect;
+        if (!entityRect.intersects(data.mTileRect, collisionRect))
         {
+            continue;
+        }
+        if (collisionRect.width >= collisionRect.height)
+        {
+            entity->setPosition({entity->position().x, static_cast<float>(data.mTileRect.top)});
+            entity->setVelocity({entity->velocity().x, 0.0f});
+            if (!surface)
+            {
+                surface = data.mTile;
+            }
+        }
+        else
+        {
+            if (collisionRect.left * 2 + collisionRect.width < data.mTileRect.left * 2 + data.mTileRect.width)
+            {
+                entity->setPosition({static_cast<float>(data.mTileRect.left) - entity->scaledSize().x / 2, entity->position().y});
+            }
+            else
+            {
+                entity->setPosition({static_cast<float>(data.mTileRect.left + data.mTileRect.width + 1) + entity->scaledSize().x / 2, entity->position().y});
+            }
+        }
+    }
+    entity->setSurface(surface);
+}
+
+void Region::detectCollisions (const sf::Rect<unsigned int> & entityRect)
+{
+    mCollisions.clear();
+    
+    unsigned int fromX = entityRect.left / mTileSize.x;
+    unsigned int toX = (entityRect.left + entityRect.width) / mTileSize.x;
+    unsigned int fromY = entityRect.top / mTileSize.y;
+    unsigned int toY = (entityRect.top + entityRect.height) / mTileSize.y;
+    
+    
+    for (unsigned int x = fromX; x <= toX; ++x)
+    {
+        if (x >= mRegionSize.x)
+        {
+            continue;
+        }
+        for (unsigned int y = fromY; y <= toY; ++y)
+        {
+            if (y >= mRegionSize.y)
+            {
+                continue;
+            }
             string tileType = mTiles[index(x, y)];
             if (!tileType.empty())
             {
@@ -103,33 +154,33 @@ void Region::resolveCollisions (Entity * entity)
                     sf::Rect<unsigned int> tileRect;
                     tileRect.left = x * mTileSize.x;
                     tileRect.top = y * mTileSize.y;
-                    tileRect.width = tile->scaledSize().x;
-                    tileRect.height = tile->scaledSize().y;
+                    tileRect.width = ceilf(tile->scaledSize().x);
+                    tileRect.height = ceilf(tile->scaledSize().y);
                     
-                    sf::Rect<unsigned int> intersectRect;
-                    if (entityRect.intersects(tileRect, intersectRect))
+                    sf::Rect<unsigned int> collisionRect;
+                    if (entityRect.intersects(tileRect, collisionRect))
                     {
-                        if (intersectRect.width > intersectRect.height)
-                        {
-                            entity->setPosition({entity->position().x, static_cast<float>(tileRect.top)});
-                            entity->setVelocity({entity->velocity().x, 0.0f});
-                        }
-                        else
-                        {
-                            if (intersectRect.left + intersectRect.left + intersectRect.width < tileRect.left + tileRect.left + tileRect.width)
-                            {
-                                entity->setPosition({static_cast<float>(tileRect.left) - entity->scaledSize().x / 2, entity->position().y});
-                            }
-                            else
-                            {
-                                entity->setPosition({static_cast<float>(tileRect.left + tileRect.width) + entity->scaledSize().x / 2, entity->position().y});
-                            }
-                            entity->setVelocity({0.0f, entity->velocity().y});
-                        }
-                        return;
+                        CollisionData data;
+                        data.mTile = tile;
+                        data.mTileRect = tileRect;
+                        data.mCollisionArea = collisionRect.width * collisionRect.height;
+                        // There's no need to store the collision rect because it just needs
+                        // to be recalculated anyway because it can change as the collision
+                        // gets resolved.
+                        
+                        mCollisions.push_back(data);
                     }
                 }
             }
         }
     }
+    if (mCollisions.size() > 1)
+    {
+        sort(mCollisions.begin(), mCollisions.end(), sortCollisions);
+    }
+}
+
+bool Region::sortCollisions (const CollisionData & item1, const CollisionData & item2)
+{
+    return item1.mCollisionArea > item2.mCollisionArea;
 }
