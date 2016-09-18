@@ -92,23 +92,40 @@ void Region::resolveCollisions (Entity * entity)
     SpriteAnimation * surface = nullptr;
     for (auto & data: mCollisions)
     {
+        // Calculate the entity position each time because it can change.
+        entityRect.left = floorf(entity->position().x - entity->scaledSize().x / 2);
+        entityRect.top = floorf(entity->position().y - entity->scaledSize().y);
+        
         sf::Rect<unsigned int> collisionRect;
         if (!entityRect.intersects(data.mTileRect, collisionRect))
         {
             continue;
         }
+        
+        // Use width vs. height to determine if the collision should be resolved from the top or bottom vs.
+        // from the left or right.
         if (collisionRect.width >= collisionRect.height)
         {
-            entity->setPosition({entity->position().x, static_cast<float>(data.mTileRect.top)});
-            entity->setVelocity({entity->velocity().x, 0.0f});
-            if (!surface)
+            // Check which side was hit. Add one so we're not trying to compare exact float values.
+            if (collisionRect.top < data.mTileRect.top + 1)
             {
-                surface = data.mTile;
+                entity->setPosition({entity->position().x, static_cast<float>(data.mTileRect.top)});
+                entity->setVelocity({entity->velocity().x, 0.0f});
+                if (!surface)
+                {
+                    surface = data.mTile;
+                }
+            }
+            else
+            {
+                entity->setPosition({entity->position().x, static_cast<float>(data.mTileRect.top + data.mTileRect.height + entityRect.height)});
+                entity->setVelocity({entity->velocity().x, 0.0f});
             }
         }
         else
         {
-            if (collisionRect.left * 2 + collisionRect.width < data.mTileRect.left * 2 + data.mTileRect.width)
+            // Check which side was hit. Add one so we're not trying to compare exact float values.
+            if (collisionRect.left < data.mTileRect.left + 1)
             {
                 entity->setPosition({static_cast<float>(data.mTileRect.left) - entity->scaledSize().x / 2, entity->position().y});
             }
@@ -116,6 +133,7 @@ void Region::resolveCollisions (Entity * entity)
             {
                 entity->setPosition({static_cast<float>(data.mTileRect.left + data.mTileRect.width + 1) + entity->scaledSize().x / 2, entity->position().y});
             }
+            entity->setVelocity({0.0f, entity->velocity().y});
         }
     }
     entity->setSurface(surface);
