@@ -109,11 +109,15 @@ void Region::resolveCollisions (Entity * entity)
             // Check which side was hit. Add one so we're not trying to compare exact float values.
             if (collisionRect.top < data.mTileRect.top + 1)
             {
-                entity->setPosition({entity->position().x, static_cast<float>(data.mTileRect.top)});
-                entity->setVelocity({entity->velocity().x, 0.0f});
-                if (!surface)
+                // Only set the entity on the tile if the entity is moving down.
+                if (entity->velocity().y > 0)
                 {
-                    surface = data.mTile;
+                    entity->setPosition({entity->position().x, static_cast<float>(data.mTileRect.top)});
+                    entity->setVelocity({entity->velocity().x, 0.0f});
+                    if (!surface)
+                    {
+                        surface = data.mTile;
+                    }
                 }
             }
             else
@@ -133,7 +137,13 @@ void Region::resolveCollisions (Entity * entity)
             {
                 entity->setPosition({static_cast<float>(data.mTileRect.left + data.mTileRect.width + 1) + entity->scaledSize().x / 2, entity->position().y});
             }
-            entity->setVelocity({0.0f, entity->velocity().y});
+            
+            // It's difficult to jump up onto tiles if catching the edge stops the X velocity. Only set the
+            // X velocity to zero if the entity is falling.
+            if (entity->velocity().y > 0)
+            {
+                entity->setVelocity({0.0f, entity->velocity().y});
+            }
         }
     }
     entity->setSurface(surface);

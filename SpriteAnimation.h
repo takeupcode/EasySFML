@@ -52,6 +52,15 @@ public:
         mSprite.setPosition(position);
     }
     
+    FrameTag * tag (const std::string & name)
+    {
+        if (mCurrentFrame)
+        {
+            return mCurrentFrame->tag(name);
+        }
+        return nullptr;
+    }
+    
     void update (float elapsedSeconds);
 
     void draw (Window * window)
