@@ -12,9 +12,9 @@
 using namespace std;
 
 Region::Region (shared_ptr<SpriteSheet> sheet, const sf::Vector2f & scale, const sf::Vector2u tileSize, unsigned int columns, unsigned int rows)
-: mScale(scale), mTileSize(tileSize), mRegionSize(columns, rows), mSheet(sheet), mGravity(0.0f)
+: mScale(scale), mTileSize(tileSize), mColumns(columns), mRows(rows), mSheet(sheet), mGravity(0.0f)
 {
-    mTiles.resize(mRegionSize.x * mRegionSize.y);
+    mTiles.resize(mColumns * mRows);
 }
 
 bool Region::addTileType (const string & typeName, const string & animationName, unsigned int beginningIndex)
@@ -47,23 +47,36 @@ void Region::draw (Window * window)
     sf::Vector2f viewCenter = view.getCenter();
     sf::Vector2f viewSize = view.getSize();
     
-    unsigned int fromX = floorf((viewCenter.x - viewSize.x / 2) / mTileSize.x);
-    unsigned int toX = ceilf((viewCenter.x + viewSize.x / 2) / mTileSize.x);
-    unsigned int fromY = floorf((viewCenter.y - viewSize.y / 2) / mTileSize.y);
-    unsigned int toY = ceilf((viewCenter.y + viewSize.y / 2) / mTileSize.y);
+    float fromXFloat = floorf((viewCenter.x - viewSize.x / 2) / mTileSize.x);
+    if (fromXFloat < 0)
+    {
+        fromXFloat = 0;
+    }
+    float toXFloat = ceilf((viewCenter.x + viewSize.x / 2) / mTileSize.x);
+    if (toXFloat >= mColumns)
+    {
+        toXFloat = mColumns - 1;
+    }
+    float fromYFloat = floorf((viewCenter.y - viewSize.y / 2) / mTileSize.y);
+    if (fromYFloat < 0)
+    {
+        fromYFloat = 0;
+    }
+    float toYFloat = ceilf((viewCenter.y + viewSize.y / 2) / mTileSize.y);
+    if (toYFloat >= mRows)
+    {
+        toYFloat = mRows - 1;
+    }
+    
+    unsigned int fromX = fromXFloat;
+    unsigned int toX = toXFloat;
+    unsigned int fromY = fromYFloat;
+    unsigned int toY = toYFloat;
     
     for (unsigned int x = fromX; x <= toX; ++x)
     {
-        if (x >= mRegionSize.x)
-        {
-            continue;
-        }
         for (unsigned int y = fromY; y <= toY; ++y)
         {
-            if (y >= mRegionSize.y)
-            {
-                continue;
-            }
             string tileType = mTiles[index(x, y)];
             if (!tileType.empty())
             {
@@ -158,16 +171,15 @@ void Region::detectCollisions (const sf::Rect<unsigned int> & entityRect)
     unsigned int fromY = entityRect.top / mTileSize.y;
     unsigned int toY = (entityRect.top + entityRect.height) / mTileSize.y;
     
-    
     for (unsigned int x = fromX; x <= toX; ++x)
     {
-        if (x >= mRegionSize.x)
+        if (x >= mColumns)
         {
             continue;
         }
         for (unsigned int y = fromY; y <= toY; ++y)
         {
-            if (y >= mRegionSize.y)
+            if (y >= mRows)
             {
                 continue;
             }

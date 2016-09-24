@@ -43,22 +43,22 @@ public:
     
     unsigned int columns ()
     {
-        return mRegionSize.x;
+        return mColumns;
     }
     
     unsigned int rows ()
     {
-        return mRegionSize.y;
+        return mRows;
     }
     
-    sf::Vector2f position ()
+    float width ()
     {
-        return mPosition;
+        return mScale.x * mColumns * mTileSize.x;
     }
     
-    void setPosition (const sf::Vector2f & position)
+    float height ()
     {
-        mPosition = position;
+        return mScale.y * mRows * mTileSize.y;
     }
     
     float gravity ()
@@ -86,7 +86,7 @@ public:
 private:
     unsigned int index (unsigned int x, unsigned int y)
     {
-        return x + y * mRegionSize.x;
+        return x + y * mColumns;
     }
     
     struct CollisionData
@@ -101,9 +101,9 @@ private:
     static bool sortCollisions (const CollisionData & item1, const CollisionData & item2);
     
     sf::Vector2f mScale;
-    sf::Vector2u mRegionSize;
+    unsigned int mColumns;
+    unsigned int mRows;
     sf::Vector2u mTileSize;
-    sf::Vector2f mPosition;
     float mGravity;
     std::shared_ptr<SpriteSheet> mSheet;
     std::unordered_map<std::string, std::unique_ptr<SpriteAnimation>> mTileTypes;
