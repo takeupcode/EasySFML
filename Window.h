@@ -25,7 +25,7 @@ class Window : public std::enable_shared_from_this<Window>, public EventSubscrib
 public:
     Window (Director * director, int identity);
     Window (Director * director, int identity, const std::string & title, const sf::Vector2u & size);
-    ~Window ();
+    virtual ~Window ();
     
     std::string title () const;
     sf::Vector2u size () const;
@@ -43,17 +43,18 @@ public:
     void handleInput ();
     
 protected:
-    void notify (EventParameter eventDetails) override;
-    
-private:
     friend class WindowManager;
     
-    void toggleFullScreen ();
+    void notify (EventParameter eventDetails) override;
     
-    void loadTriggers ();
+    virtual void toggleFullScreen ();
     
-    void create ();
-    void destroy ();
+    virtual void createTriggers ();
+    virtual void loadTriggers ();
+    virtual void unloadTriggers ();
+    
+    virtual void create ();
+    virtual void destroy ();
     
     sf::RenderWindow mWindow;
     int mIdentity;

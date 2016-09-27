@@ -32,6 +32,7 @@ bool WindowManager::addWindow (shared_ptr<Window> window)
     
     if (windowAdded)
     {
+        window->createTriggers();
         window->loadTriggers();
     }
     
@@ -42,6 +43,11 @@ void WindowManager::notify (EventParameter eventDetails)
 {
     if (eventDetails.name() == EventManager::WindowClosed)
     {
+        auto position = mWindows.find(eventDetails.window().mIdentity);
+        if (position != mWindows.end())
+        {
+            mWindows.erase(position);
+        }
     }
 }
 

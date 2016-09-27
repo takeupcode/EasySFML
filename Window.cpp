@@ -28,6 +28,7 @@ mHasFocus(true)
 
 Window::~Window ()
 {
+    unloadTriggers();
     destroy();
 }
 
@@ -113,6 +114,15 @@ void Window::notify (EventParameter eventDetails)
     {
         mHasFocus = true;
     }
+    else if (eventDetails.name() == EventManager::WindowResized)
+    {
+        mSize.x = eventDetails.size().width;
+        mSize.y = eventDetails.size().height;
+    }
+}
+
+void Window::createTriggers()
+{
 }
 
 void Window::loadTriggers()
@@ -120,6 +130,15 @@ void Window::loadTriggers()
     mEventManager->addSubscription(EventManager::WindowToggleFullScreen, "Window", shared_from_this());
     mEventManager->addSubscription(EventManager::WindowFocusLost, "Window", shared_from_this());
     mEventManager->addSubscription(EventManager::WindowFocusGained, "Window", shared_from_this());
+    mEventManager->addSubscription(EventManager::WindowResized, "Window", shared_from_this());
+}
+
+void Window::unloadTriggers()
+{
+    mEventManager->removeSubscription(EventManager::WindowToggleFullScreen, "Window");
+    mEventManager->removeSubscription(EventManager::WindowFocusLost, "Window");
+    mEventManager->removeSubscription(EventManager::WindowFocusGained, "Window");
+    mEventManager->removeSubscription(EventManager::WindowResized, "Window");
 }
 
 void Window::create ()

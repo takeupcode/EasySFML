@@ -29,6 +29,8 @@ public:
     {
         return mIdentity;
     }
+    
+    virtual std::string name () const = 0;
 
     bool isTransparent () const
     {
@@ -45,32 +47,28 @@ public:
         return mActive;
     }
     
-    virtual void created ()
-    {
-        mCreated = true;
-    }
+    virtual void created ();
     
     virtual void destroyed ()
     {
+        unloadTriggers();
+        
+        mDestroyed = true;
     }
     
     virtual void activated ()
     {
-        loadTriggers();
-        
         mActive = true;
     }
     
     virtual void deactivated ()
     {
-        unloadTriggers();
-        
         mActive = false;
     }
     
-    bool hasBeenCreated ()
+    bool hasBeenRecreated ()
     {
-        return mCreated;
+        return mCreated && mDestroyed;
     }
     
     sf::View view () const
@@ -86,11 +84,11 @@ protected:
     
     Scene (Director * director, int identity, std::shared_ptr<Window> window, bool transparent, bool modal);
     
-    virtual void loadTriggers () = 0;
-    virtual void unloadTriggers () = 0;
+    virtual void createTriggers ();
+    virtual void loadTriggers ();
+    virtual void unloadTriggers ();
     
-    void notify (EventParameter eventDetails) override
-    { }
+    void notify (EventParameter eventDetails) override;
     
     std::shared_ptr<Window> mWindow;
     int mIdentity;
@@ -98,6 +96,7 @@ protected:
     bool mModal;
     bool mActive;
     bool mCreated;
+    bool mDestroyed;
     Scene * mPreviousScene;
     Scene * mNextScene;
     sf::View mView;
