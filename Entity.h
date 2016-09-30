@@ -12,14 +12,16 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "Directable.h"
+
 class SpriteAnimation;
 class Window;
 
-class Entity
+class Entity : public Directable
 {
 public:
-    Entity (const sf::Vector2f & position, const sf::Vector2f & velocity, const sf::Vector2f & acceleration, const sf::Vector2u & size, const sf::Vector2f & scale)
-    : mPosition(position), mVelocity(velocity), mAcceleration(acceleration), mSize(size), mScale(scale), mSurfaceTile(nullptr)
+    Entity (Director * director, const sf::Vector2f & position, const sf::Vector2f & velocity, const sf::Vector2f & acceleration, const sf::Vector2u & size, const sf::Vector2f & scale)
+    : Directable(director), mPosition(position), mVelocity(velocity), mAcceleration(acceleration), mSize(size), mScale(scale), mSurfaceTile(nullptr)
     { }
     
     virtual ~Entity () = default;

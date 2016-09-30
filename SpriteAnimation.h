@@ -52,6 +52,8 @@ public:
         mSprite.setPosition(position);
     }
     
+    void setAnimation (const std::string & animationName);
+    
     FrameTag * tag (const std::string & name)
     {
         if (mCurrentFrame)

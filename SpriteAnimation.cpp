@@ -12,6 +12,12 @@ SpriteAnimation::SpriteAnimation (std::shared_ptr<SpriteSheet> sheet, const std:
 : mScale(scale), mSheet(sheet), mCurrentIndex(beginningIndex), mTimeInFrame(0), mUpdateSprite(true)
 {
     mSprite.setScale(mScale);
+    
+    setAnimation(animationName);
+}
+
+void SpriteAnimation::setAnimation (const std::string & animationName)
+{
     mCurrentAnimation = mSheet->animation(animationName);
     if (mCurrentAnimation)
     {

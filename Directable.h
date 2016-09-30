@@ -29,8 +29,7 @@ protected:
     : mDirector(src.mDirector)
     { }
     
-    virtual ~Directable ()
-    { }
+    virtual ~Directable () = default;
     
     Directable & operator = (const Directable & rhs)
     {
