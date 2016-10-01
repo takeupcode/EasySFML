@@ -21,8 +21,8 @@
 class SpriteSheet
 {
 public:
-    explicit SpriteSheet (const std::shared_ptr<sf::Texture> & texture)
-    : mTexture(texture)
+    explicit SpriteSheet (const std::string & name, const std::shared_ptr<sf::Texture> & texture)
+    : mName(name), mTexture(texture)
     { }
     
     SpriteSheet (const SpriteSheet &) = default;
@@ -31,14 +31,19 @@ public:
     SpriteSheet & operator = (const SpriteSheet &) = default;
     SpriteSheet & operator = (SpriteSheet &&) = default;
     
+    std::string name () const
+    {
+        return mName;
+    }
+    
     std::shared_ptr<sf::Texture> texture () const
     {
         return mTexture;
     }
     
-    AnimationDefinition * animation (const std::string & name)
+    AnimationDefinition * animation (const std::string & animationName)
     {
-        auto position = mAnimations.find(name);
+        auto position = mAnimations.find(animationName);
         if (position != mAnimations.end())
         {
             return position->second.get();
@@ -47,9 +52,9 @@ public:
         return nullptr;
     }
     
-    AnimationDefinition * addAnimation (const std::string & name, const std::string & nextName)
+    AnimationDefinition * addAnimation (const std::string & animationName, const std::string & nextAnimationName)
     {
-        auto result = mAnimations.emplace(name, std::unique_ptr<AnimationDefinition>(new AnimationDefinition(name, nextName)));
+        auto result = mAnimations.emplace(animationName, std::unique_ptr<AnimationDefinition>(new AnimationDefinition(animationName, nextAnimationName)));
         AnimationDefinition * newAnimation = result.second ? result.first->second.get() : nullptr;
         
         if (newAnimation)
@@ -63,12 +68,13 @@ public:
         return newAnimation;
     }
     
-    bool removeAnimation (const std::string & name)
+    bool removeAnimation (const std::string & animationName)
     {
-        return (mAnimations.erase(name) == 1);
+        return (mAnimations.erase(animationName) == 1);
     }
     
 private:
+    std::string mName;
     std::shared_ptr<sf::Texture> mTexture;
     std::unordered_map<std::string, std::unique_ptr<AnimationDefinition>> mAnimations;
 };

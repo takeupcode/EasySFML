@@ -9,6 +9,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
 #include <SFML/Graphics.hpp>
 
@@ -36,6 +37,16 @@ public:
         return mSprite.getPosition();
     }
     
+    sf::Vector2u size ()
+    {
+        if (mCurrentFrame)
+        {
+            return mCurrentFrame->size();
+        }
+        
+        return {0, 0};
+    }
+    
     sf::Vector2f scaledSize ()
     {
         if (mCurrentFrame)
@@ -51,8 +62,10 @@ public:
     {
         mSprite.setPosition(position);
     }
+
+    void addAnimation (std::shared_ptr<SpriteSheet> sheet, const std::string & animationName);
     
-    void setAnimation (const std::string & animationName);
+    void setAnimation (const std::string & animationName, unsigned int beginningIndex = 0);
     
     FrameTag * tag (const std::string & name)
     {
@@ -75,9 +88,10 @@ public:
 
 private:
     sf::Vector2f mScale;
-    std::shared_ptr<SpriteSheet> mSheet;
+    std::unordered_map<std::string, std::shared_ptr<SpriteSheet>> mAnimations;
     AnimationDefinition * mCurrentAnimation;
     FrameDefinition * mCurrentFrame;
+    std::string mCurrentSheetName;
     unsigned int mCurrentIndex;
     float mTimeInFrame;
     sf::Sprite mSprite;

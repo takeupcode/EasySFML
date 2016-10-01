@@ -9,24 +9,46 @@
 #include "SpriteAnimation.h"
 
 SpriteAnimation::SpriteAnimation (std::shared_ptr<SpriteSheet> sheet, const std::string & animationName, const sf::Vector2f & scale, unsigned int beginningIndex)
-: mScale(scale), mSheet(sheet), mCurrentIndex(beginningIndex), mTimeInFrame(0), mUpdateSprite(true)
+: mScale(scale), mCurrentAnimation(nullptr), mCurrentFrame(nullptr), mCurrentIndex(beginningIndex), mTimeInFrame(0), mUpdateSprite(false)
 {
     mSprite.setScale(mScale);
     
-    setAnimation(animationName);
+    addAnimation(sheet, animationName);
+    setAnimation(animationName, beginningIndex);
 }
 
-void SpriteAnimation::setAnimation (const std::string & animationName)
+void SpriteAnimation::addAnimation (std::shared_ptr<SpriteSheet> sheet, const std::string & animationName)
 {
-    mCurrentAnimation = mSheet->animation(animationName);
+    mAnimations.emplace(animationName, sheet);
+}
+
+void SpriteAnimation::setAnimation (const std::string & animationName, unsigned int beginningIndex)
+{
+    auto position = mAnimations.find(animationName);
+    if (position != mAnimations.end())
+    {
+        SpriteSheet * sheet = position->second.get();
+        AnimationDefinition * newAnimation = sheet->animation(animationName);
+        if (newAnimation && newAnimation != mCurrentAnimation)
+        {
+            mCurrentAnimation = newAnimation;
+            mCurrentIndex = beginningIndex;
+            if (mCurrentSheetName != sheet->name())
+            {
+                mSprite.setTexture(*sheet->texture());
+                mCurrentSheetName = sheet->name();
+            }
+        }
+    }
+    
     if (mCurrentAnimation)
     {
         mCurrentFrame = mCurrentAnimation->frame(mCurrentIndex);
         if (mCurrentFrame)
         {
-            mSprite.setTexture(*mSheet->texture());
             mSprite.setTextureRect(mCurrentFrame->croppingRectangle());
             mSprite.setOrigin(mCurrentFrame->size().x / 2, mCurrentFrame->size().y);
+            mUpdateSprite = true;
         }
         else
         {
