@@ -41,6 +41,11 @@ public:
         return mTileSize;
     }
     
+    sf::Vector2f tileScaledSize ()
+    {
+        return {mTileSize.x * mScale.x, mTileSize.y * mScale.y};
+    }
+    
     unsigned int columns ()
     {
         return mColumns;

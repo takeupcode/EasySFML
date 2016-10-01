@@ -47,22 +47,22 @@ void Region::draw (Window * window)
     sf::Vector2f viewCenter = view.getCenter();
     sf::Vector2f viewSize = view.getSize();
     
-    float fromXFloat = floorf((viewCenter.x - viewSize.x / 2) / mTileSize.x);
+    float fromXFloat = floorf((viewCenter.x - viewSize.x / 2) / (mTileSize.x * mScale.x));
     if (fromXFloat < 0)
     {
         fromXFloat = 0;
     }
-    float toXFloat = ceilf((viewCenter.x + viewSize.x / 2) / mTileSize.x);
+    float toXFloat = ceilf((viewCenter.x + viewSize.x / 2) / (mTileSize.x * mScale.x));
     if (toXFloat >= mColumns)
     {
         toXFloat = mColumns - 1;
     }
-    float fromYFloat = floorf((viewCenter.y - viewSize.y / 2) / mTileSize.y);
+    float fromYFloat = floorf((viewCenter.y - viewSize.y / 2) / (mTileSize.y * mScale.y));
     if (fromYFloat < 0)
     {
         fromYFloat = 0;
     }
-    float toYFloat = ceilf((viewCenter.y + viewSize.y / 2) / mTileSize.y);
+    float toYFloat = ceilf((viewCenter.y + viewSize.y / 2) / (mTileSize.y * mScale.y));
     if (toYFloat >= mRows)
     {
         toYFloat = mRows - 1;
@@ -84,7 +84,7 @@ void Region::draw (Window * window)
                 if (tilePosition != mTileTypes.end())
                 {
                     SpriteAnimation * tile = tilePosition->second.get();
-                    tile->setPosition({x * mTileSize.x + tile->scaledSize().x / 2, y * mTileSize.y + tile->scaledSize().y});
+                    tile->setPosition({x * mTileSize.x * mScale.x + tile->scaledSize().x / 2, y * mTileSize.y * mScale.y + tile->scaledSize().y});
                     tile->draw(window);
                 }
             }
@@ -166,10 +166,10 @@ void Region::detectCollisions (const sf::Rect<unsigned int> & entityRect)
 {
     mCollisions.clear();
     
-    unsigned int fromX = entityRect.left / mTileSize.x;
-    unsigned int toX = (entityRect.left + entityRect.width) / mTileSize.x;
-    unsigned int fromY = entityRect.top / mTileSize.y;
-    unsigned int toY = (entityRect.top + entityRect.height) / mTileSize.y;
+    unsigned int fromX = entityRect.left / (mTileSize.x * mScale.x);
+    unsigned int toX = (entityRect.left + entityRect.width) / (mTileSize.x * mScale.x);
+    unsigned int fromY = entityRect.top / (mTileSize.y * mScale.y);
+    unsigned int toY = (entityRect.top + entityRect.height) / (mTileSize.y * mScale.y);
     
     for (unsigned int x = fromX; x <= toX; ++x)
     {
@@ -192,8 +192,8 @@ void Region::detectCollisions (const sf::Rect<unsigned int> & entityRect)
                     SpriteAnimation * tile = tilePosition->second.get();
                     
                     sf::Rect<unsigned int> tileRect;
-                    tileRect.left = x * mTileSize.x;
-                    tileRect.top = y * mTileSize.y;
+                    tileRect.left = x * mTileSize.x * mScale.x;
+                    tileRect.top = y * mTileSize.y * mScale.y;
                     tileRect.width = ceilf(tile->scaledSize().x);
                     tileRect.height = ceilf(tile->scaledSize().y);
                     
