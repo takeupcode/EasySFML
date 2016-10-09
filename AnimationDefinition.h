@@ -16,6 +16,8 @@
 
 #include "FrameDefinition.h"
 
+class SpriteSheet;
+
 class AnimationDefinition
 {
 public:
@@ -50,12 +52,7 @@ public:
         return nullptr;
     }
     
-    FrameDefinition * addFrame (float time, const sf::Vector2u & topLeft, const sf::Vector2u & size)
-    {
-        mFrames.emplace_back(std::unique_ptr<FrameDefinition>(new FrameDefinition(time, topLeft, size)));
-        
-        return mFrames[mFrames.size() - 1].get();
-    }
+    FrameDefinition * addFrame (const std::string & imageName, float time);
     
     bool removeFrame (unsigned int index)
     {
@@ -71,8 +68,8 @@ public:
 private:
     friend class SpriteSheet;
     
-    AnimationDefinition (const std::string & animationName, const std::string & nextAnimationName)
-    : mName(animationName), mNextName(nextAnimationName), mNextAnimation(nullptr)
+    AnimationDefinition (const std::string & animationName, const std::string & nextAnimationName, const SpriteSheet * sheet)
+    : mName(animationName), mNextName(nextAnimationName), mNextAnimation(nullptr), mSheet(sheet)
     { }
     
     void animationAdded (AnimationDefinition * animation)
@@ -87,4 +84,5 @@ private:
     std::string mNextName;
     AnimationDefinition * mNextAnimation;
     std::vector<std::unique_ptr<FrameDefinition>> mFrames;
+    const SpriteSheet * mSheet;
 };

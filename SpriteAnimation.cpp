@@ -47,7 +47,7 @@ void SpriteAnimation::setAnimation (const std::string & animationName, unsigned 
         if (mCurrentFrame)
         {
             mSprite.setTextureRect(mCurrentFrame->croppingRectangle());
-            mSprite.setOrigin(mCurrentFrame->size().x / 2, mCurrentFrame->size().y);
+            mSprite.setOrigin(mCurrentFrame->width() / 2 - mCurrentFrame->croppingX(), mCurrentFrame->height() - mCurrentFrame->croppingY());
             mUpdateSprite = true;
         }
         else
@@ -97,6 +97,6 @@ void SpriteAnimation::update (float elapsedSeconds)
             }
         }
         mSprite.setTextureRect(mCurrentFrame->croppingRectangle());
-        mSprite.setOrigin(mCurrentFrame->size().x / 2, mCurrentFrame->size().y);
+        mSprite.setOrigin(mCurrentFrame->width() / 2 - mCurrentFrame->croppingX(), mCurrentFrame->height() - mCurrentFrame->croppingY());
     }
 }

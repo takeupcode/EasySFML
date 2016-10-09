@@ -15,6 +15,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "FrameTag.h"
+#include "SpriteImage.h"
 
 class FrameDefinition
 {
@@ -32,12 +33,37 @@ public:
     
     sf::Vector2u size () const
     {
-        return mSize;
+        return mImage->sourceSize();
+    }
+    
+    unsigned int width () const
+    {
+        return mImage->sourceWidth();
+    }
+    
+    unsigned int height () const
+    {
+        return mImage->sourceHeight();
     }
     
     sf::IntRect croppingRectangle () const
     {
-        return sf::IntRect(mTopLeft.x, mTopLeft.y, mSize.x, mSize.y);
+        return sf::IntRect(mImage->sheetX(), mImage->sheetY(), mImage->sheetWidth(), mImage->sheetHeight());
+    }
+    
+    sf::Vector2u croppingOffset () const
+    {
+        return sf::Vector2u(mImage->sourceX(), mImage->sourceY());
+    }
+    
+    unsigned int croppingX () const
+    {
+        return mImage->sourceX();
+    }
+    
+    unsigned int croppingY () const
+    {
+        return mImage->sourceY();
     }
     
     FrameTag * tag (const std::string & name)
@@ -83,8 +109,8 @@ public:
 private:
     friend class AnimationDefinition;
     
-    FrameDefinition (float time, const sf::Vector2u & topLeft, const sf::Vector2u & size)
-    : mTime(time), mTopLeft(topLeft), mSize(size)
+    FrameDefinition (float time, const SpriteImage * image)
+    : mTime(time), mImage(image)
     { }
     
     FrameTag * addFrameTag (const std::string & name, const FrameTag & tag)
@@ -94,7 +120,6 @@ private:
     }
     
     float mTime;
-    sf::Vector2u mTopLeft;
-    sf::Vector2u mSize;
+    const SpriteImage * mImage;
     std::unordered_map<std::string, std::unique_ptr<FrameTag>> mTags;
 };

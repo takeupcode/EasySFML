@@ -14,16 +14,15 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "FrameTag.h"
-#include "FrameDefinition.h"
 #include "AnimationDefinition.h"
+#include "FrameDefinition.h"
+#include "FrameTag.h"
+#include "SpriteImage.h"
     
 class SpriteSheet
 {
 public:
-    explicit SpriteSheet (const std::string & name, const std::shared_ptr<sf::Texture> & texture)
-    : mName(name), mTexture(texture)
-    { }
+    SpriteSheet (const std::string & name, const std::string & dataFileName, const std::shared_ptr<sf::Texture> & texture);
     
     SpriteSheet (const SpriteSheet &) = default;
     SpriteSheet (SpriteSheet &&) = default;
@@ -41,7 +40,18 @@ public:
         return mTexture;
     }
     
-    AnimationDefinition * animation (const std::string & animationName)
+    const SpriteImage * image (const std::string & imageName) const
+    {
+        auto position = mImages.find(imageName);
+        if (position != mImages.end())
+        {
+            return position->second.get();
+        }
+        
+        return nullptr;
+    }
+    
+    AnimationDefinition * animation (const std::string & animationName) const
     {
         auto position = mAnimations.find(animationName);
         if (position != mAnimations.end())
@@ -54,7 +64,7 @@ public:
     
     AnimationDefinition * addAnimation (const std::string & animationName, const std::string & nextAnimationName)
     {
-        auto result = mAnimations.emplace(animationName, std::unique_ptr<AnimationDefinition>(new AnimationDefinition(animationName, nextAnimationName)));
+        auto result = mAnimations.emplace(animationName, std::unique_ptr<AnimationDefinition>(new AnimationDefinition(animationName, nextAnimationName, this)));
         AnimationDefinition * newAnimation = result.second ? result.first->second.get() : nullptr;
         
         if (newAnimation)
@@ -77,4 +87,5 @@ private:
     std::string mName;
     std::shared_ptr<sf::Texture> mTexture;
     std::unordered_map<std::string, std::unique_ptr<AnimationDefinition>> mAnimations;
+    std::unordered_map<std::string, std::unique_ptr<SpriteImage>> mImages;
 };
