@@ -13,6 +13,8 @@
 #include <SFML/Graphics.hpp>
 
 #include "Directable.h"
+#include "Direction.h"
+#include "EntityState.h"
 
 class SpriteAnimation;
 class Window;
@@ -20,13 +22,23 @@ class Window;
 class Entity : public Directable
 {
 public:
-    Entity (Director * director, const sf::Vector2f & position, const sf::Vector2f & velocity, const sf::Vector2f & acceleration, const sf::Vector2f & scale)
-    : Directable(director), mPosition(position), mVelocity(velocity), mAcceleration(acceleration), mSize({0, 0}), mScale(scale), mSurfaceTile(nullptr)
+    Entity (Director * director, EntityState * state, const sf::Vector2f & position, const sf::Vector2f & velocity, const sf::Vector2f & acceleration, const sf::Vector2f & scale, Direction dir = Direction::East)
+    : Directable(director), mCurrentState(state), mNewState(nullptr), mPosition(position), mVelocity(velocity), mAcceleration(acceleration), mSize({0, 0}), mScale(scale), mSurfaceTile(nullptr), mDirection(dir)
     { }
     
     virtual ~Entity () = default;
     
-    virtual void update (float elapsedSeconds) = 0;
+    virtual void handleCommand (int command)
+    {
+        mCurrentState->handleCommand(command);
+        handleStateChange();
+    }
+    
+    virtual void update (float elapsedSeconds)
+    {
+        mCurrentState->update(elapsedSeconds);
+        handleStateChange();
+    }
     
     virtual void draw (Window * window) = 0;
     
@@ -118,11 +130,43 @@ public:
         mSurfaceTile = tile;
     }
     
+    Direction direction () const
+    {
+        return mDirection;
+    }
+    
+    void setDirection (Direction dir)
+    {
+        mDirection = dir;
+    }
+    
+    void setNewState (EntityState * state)
+    {
+        mNewState = state;
+    }
+    
 protected:
+    void handleStateChange ()
+    {
+        if (mNewState)
+        {
+            if (mNewState != mCurrentState)
+            {
+                mCurrentState->exit();
+                mCurrentState = mNewState;
+                mCurrentState->enter();
+            }
+            mNewState = nullptr;
+        }
+    }
+    
+    EntityState * mCurrentState;
+    EntityState * mNewState;
     sf::Vector2f mPosition;
     sf::Vector2f mVelocity;
     sf::Vector2f mAcceleration;
     sf::Vector2u mSize;
     sf::Vector2f mScale;
     SpriteAnimation * mSurfaceTile;
+    Direction mDirection;
 };

@@ -12,8 +12,6 @@ enum class Direction
 {
     East = 0,
     West,
-    Up,
-    Down,
     North,
     South,
     NorthEast,

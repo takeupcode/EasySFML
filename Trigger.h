@@ -49,8 +49,11 @@ public:
         
         // And these types represent current states.
         CurrentKeyboardKeyPressed = sf::Event::Count + 1,
+        CurrentKeyboardKeyNotPressed,
         CurrentMouseButtonPressed,
-        CurrentJoystickButtonPressed
+        CurrentMouseButtonNotPressed,
+        CurrentJoystickButtonPressed,
+        CurrentJoystickButtonNotPressed
     };
 
     class TriggerPoint
@@ -406,6 +409,14 @@ public:
                     }
                     continue;
                 }
+                else if (triggerPoint.type() == TriggerType::CurrentKeyboardKeyNotPressed)
+                {
+                    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key(triggerPoint.code())))
+                    {
+                        ++mData->mTriggerPointMatches;
+                    }
+                    continue;
+                }
                 else if (triggerPoint.type() == TriggerType::CurrentMouseButtonPressed)
                 {
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button(triggerPoint.code())))
@@ -421,6 +432,14 @@ public:
                     }
                     continue;
                 }
+                else if (triggerPoint.type() == TriggerType::CurrentMouseButtonNotPressed)
+                {
+                    if (!sf::Mouse::isButtonPressed(sf::Mouse::Button(triggerPoint.code())))
+                    {
+                        ++mData->mTriggerPointMatches;
+                    }
+                    continue;
+                }
                 else if (triggerPoint.type() == TriggerType::CurrentJoystickButtonPressed)
                 {
                     if (sf::Joystick::isButtonPressed(triggerPoint.device(), triggerPoint.code()))
@@ -430,6 +449,14 @@ public:
                         event.button = triggerPoint.code();
                         
                         mData->mDetails.setJoystickButton(event);
+                        ++mData->mTriggerPointMatches;
+                    }
+                    continue;
+                }
+                else if (triggerPoint.type() == TriggerType::CurrentJoystickButtonNotPressed)
+                {
+                    if (!sf::Joystick::isButtonPressed(triggerPoint.device(), triggerPoint.code()))
+                    {
                         ++mData->mTriggerPointMatches;
                     }
                     continue;

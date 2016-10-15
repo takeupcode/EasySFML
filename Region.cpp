@@ -95,8 +95,10 @@ void Region::draw (Window * window)
 void Region::resolveCollisions (Entity * entity)
 {
     sf::Rect<unsigned int> entityRect;
-    entityRect.left = floorf(entity->position().x - entity->scaledSize().x / 2);
-    entityRect.top = floorf(entity->position().y - entity->scaledSize().y);
+    float tempFloor = floorf(entity->position().x - entity->scaledSize().x / 2);
+    entityRect.left = tempFloor < 0 ? 0 : tempFloor;
+    tempFloor = floorf(entity->position().y - entity->scaledSize().y);
+    entityRect.top = tempFloor < 0 ? 0 : tempFloor;
     entityRect.width = ceilf(entity->scaledSize().x);
     entityRect.height = ceilf(entity->scaledSize().y);
     
@@ -106,8 +108,10 @@ void Region::resolveCollisions (Entity * entity)
     for (auto & data: mCollisions)
     {
         // Calculate the entity position each time because it can change.
-        entityRect.left = floorf(entity->position().x - entity->scaledSize().x / 2);
-        entityRect.top = floorf(entity->position().y - entity->scaledSize().y);
+        tempFloor = floorf(entity->position().x - entity->scaledSize().x / 2);
+        entityRect.left = tempFloor < 0 ? 0 : tempFloor;
+        tempFloor = floorf(entity->position().y - entity->scaledSize().y);
+        entityRect.top = tempFloor < 0 ? 0 : tempFloor;
         
         sf::Rect<unsigned int> collisionRect;
         if (!entityRect.intersects(data.mTileRect, collisionRect))
