@@ -19,7 +19,7 @@ Region::Region (shared_ptr<SpriteSheet> sheet, const sf::Vector2f & scale, const
 
 bool Region::addTileType (const string & typeName, const string & animationName, unsigned int beginningIndex)
 {
-    auto result = mTileTypes.emplace(typeName, unique_ptr<SpriteAnimation>(new SpriteAnimation(mSheet, animationName, mScale, beginningIndex)));
+    auto result = mTileTypes.emplace(typeName, unique_ptr<Tile>(new Tile(mSheet, animationName, mScale, beginningIndex)));
     return result.second;
 }
 
@@ -83,7 +83,7 @@ void Region::draw (Window * window)
                 auto tilePosition = mTileTypes.find(tileType);
                 if (tilePosition != mTileTypes.end())
                 {
-                    SpriteAnimation * tile = tilePosition->second.get();
+                    Tile * tile = tilePosition->second.get();
                     tile->setPosition({x * mTileSize.x * mScale.x + tile->scaledSize().x / 2, y * mTileSize.y * mScale.y + tile->scaledSize().y});
                     tile->draw(window);
                 }
@@ -104,7 +104,7 @@ void Region::resolveCollisions (Entity * entity)
     
     detectCollisions(entityRect);
     
-    SpriteAnimation * surface = nullptr;
+    Tile * surface = nullptr;
     for (auto & data: mCollisions)
     {
         // Calculate the entity position each time because it can change.
@@ -193,7 +193,7 @@ void Region::detectCollisions (const sf::Rect<unsigned int> & entityRect)
                 auto tilePosition = mTileTypes.find(tileType);
                 if (tilePosition != mTileTypes.end())
                 {
-                    SpriteAnimation * tile = tilePosition->second.get();
+                    Tile * tile = tilePosition->second.get();
                     
                     sf::Rect<unsigned int> tileRect;
                     tileRect.left = x * mTileSize.x * mScale.x;

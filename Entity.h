@@ -9,12 +9,14 @@
 #pragma once
 
 #include <math.h>
+#include <memory>
 
 #include <SFML/Graphics.hpp>
 
 #include "Directable.h"
 #include "Direction.h"
 #include "EntityState.h"
+#include "Tile.h"
 
 class SpriteAnimation;
 class Window;
@@ -120,12 +122,12 @@ public:
         return {mSize.x * mScale.x, mSize.y * mScale.y};
     }
     
-    SpriteAnimation * surface () const
+    Tile * surface () const
     {
         return mSurfaceTile;
     }
     
-    void setSurface (SpriteAnimation * tile)
+    void setSurface (Tile * tile)
     {
         mSurfaceTile = tile;
     }
@@ -162,11 +164,12 @@ protected:
     
     EntityState * mCurrentState;
     EntityState * mNewState;
+    std::shared_ptr<SpriteAnimation> mAnimation;
     sf::Vector2f mPosition;
     sf::Vector2f mVelocity;
     sf::Vector2f mAcceleration;
     sf::Vector2u mSize;
     sf::Vector2f mScale;
-    SpriteAnimation * mSurfaceTile;
+    Tile * mSurfaceTile;
     Direction mDirection;
 };

@@ -77,6 +77,12 @@ public:
         return nullptr;
     }
     
+    FrameTag * addTag (const std::string & name, bool value)
+    {
+        FrameTag tag(value);
+        return addFrameTag(name, tag);
+    }
+    
     FrameTag * addTag (const std::string & name, int value)
     {
         FrameTag tag(value);

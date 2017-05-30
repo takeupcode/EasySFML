@@ -17,6 +17,7 @@ class FrameTag
 public:
     enum class TagType
     {
+        BoolTag,
         IntTag,
         FloatTag,
         StringTag,
@@ -32,6 +33,11 @@ public:
     TagType type () const
     {
         return mType;
+    }
+    
+    bool boolValue () const
+    {
+        return mBoolValue;
     }
     
     int intValue () const
@@ -57,6 +63,10 @@ public:
 private:
     friend class FrameDefinition;
     
+    FrameTag (bool value)
+    : mType(TagType::BoolTag), mBoolValue(value)
+    { }
+    
     FrameTag (int value)
     : mType(TagType::IntTag), mIntValue(value)
     { }
@@ -76,6 +86,7 @@ private:
     TagType mType;
     union
     {
+        bool mBoolValue;
         int mIntValue;
         float mFloatValue;
         sf::IntRect mRectangleValue;

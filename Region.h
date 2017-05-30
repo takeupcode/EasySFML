@@ -14,8 +14,8 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "SpriteAnimation.h"
 #include "SpriteSheet.h"
+#include "Tile.h"
 #include "Window.h"
 
 class Entity;
@@ -96,7 +96,7 @@ private:
     
     struct CollisionData
     {
-        SpriteAnimation * mTile;
+        Tile * mTile;
         sf::Rect<unsigned int> mTileRect;
         unsigned int mCollisionArea;
     };
@@ -111,7 +111,7 @@ private:
     sf::Vector2u mTileSize;
     float mGravity;
     std::shared_ptr<SpriteSheet> mSheet;
-    std::unordered_map<std::string, std::unique_ptr<SpriteAnimation>> mTileTypes;
+    std::unordered_map<std::string, std::unique_ptr<Tile>> mTileTypes;
     std::vector<std::string> mTiles;
     std::vector<CollisionData> mCollisions;
 };
